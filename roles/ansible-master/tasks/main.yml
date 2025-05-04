@@ -1,0 +1,28 @@
+---
+- name: Ensure ansible user exists
+  user:
+    name: ansible
+    shell: /bin/bash
+    groups: wheel
+    append: yes
+    create_home: yes
+
+- name: Generate SSH key pair for ansible user
+  openssh_keypair:
+    path: /home/ansible/.ssh/id_rsa
+    owner: ansible
+    group: ansible
+    type: rsa
+    size: 4096
+    state: present
+
+- name: add SSH key for ansible user
+  authorized_key:
+    user: ansible
+    key: "{{ lookup('file',  'files/id_rsa.pub') }}"
+    state: present
+
+- name: Install Git
+  package: 
+    name: git
+    state: present
